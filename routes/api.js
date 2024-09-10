@@ -1,16 +1,9 @@
 import express from "express";
-import User from "./models/User.js"; // Make sure to create the User model file first
-import path from "path"
-const app = express();
-
-// Middleware to parse JSON bodies
-app.use(express.json());
-
-// Serve static files from the public directory (frontend)
-app.use(express.static(path.join(path.resolve(), 'public')));
+const router = express.Router();
+import User from "../models/User.js";
 
 // Register route
-app.post("/register", async (req, res) => {
+router.post("/register", async (req, res) => {
     try {
         const { username, password } = req.body;
         const user = new User({ username, password });
@@ -26,9 +19,11 @@ app.post("/register", async (req, res) => {
 });
 
 // Login route
-app.post("/login", async (req, res) => {
+async function loginPost(req, res) {
+    console.log("loginPost");
     try {
         const { username, password } = req.body;
+        console.log("username", username);
         const user = await User.findOne({ username, password });
         if (!user) {
             return res.status(401).json({ message: "Invalid credentials" });
@@ -37,6 +32,7 @@ app.post("/login", async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
     }
-});
+}
+router.post("/login", loginPost);
 
-export default app;
+export default router;
